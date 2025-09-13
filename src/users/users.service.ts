@@ -2,10 +2,14 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { HashingServiceProtocol } from 'src/auth/hash/hashing.service';
 
 @Injectable()
 export class UsersService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private hashingService: HashingServiceProtocol,
+  ) {}
 
   async findOne(id: number) {
     const user = await this.prisma.user.findUnique({
@@ -33,6 +37,11 @@ export class UsersService {
 
   async create(createUserDto: CreateUserDto) {
     try {
+      const passwordHash = await this.hashingService.hash(
+        createUserDto.password,
+      );
+      createUserDto.password = passwordHash;
+
       const user = await this.prisma.user.create({
         data: {
           name: createUserDto.name,
@@ -56,12 +65,36 @@ export class UsersService {
 
   async update(id: number, updateUserDto: UpdateUserDto) {
     try {
-      const user = await this.prisma.user.update({
+      const user = await this.prisma.user.findUnique({
+        where: { id },
+      });
+
+      if (!user) {
+        throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+      }
+
+      const dataUser: {
+        name?: string;
+        passwordHash?: string;
+      } = {
+        name: updateUserDto.name ? updateUserDto.name : user.name,
+      };
+
+      if (updateUserDto.password) {
+        const passwordHash = await this.hashingService.hash(
+          updateUserDto.password,
+        );
+        dataUser.passwordHash = passwordHash;
+      }
+
+      const updateUser = await this.prisma.user.update({
         where: { id },
         data: {
-          name: updateUserDto.name,
+          name: dataUser.name,
           email: updateUserDto.email,
-          passwordHash: updateUserDto.password,
+          passwordHash: dataUser.passwordHash
+            ? dataUser.passwordHash
+            : user.passwordHash,
         },
         select: {
           id: true,
@@ -70,7 +103,7 @@ export class UsersService {
         },
       });
 
-      return user;
+      return updateUser;
     } catch (error) {
       throw new HttpException('User not found', HttpStatus.NOT_FOUND);
     }

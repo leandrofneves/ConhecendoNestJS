@@ -7,9 +7,11 @@ import {
   ParseIntPipe,
   Patch,
   Post,
+  UseGuards,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
+import { AuthTokenGard } from 'src/auth/guard/auth-token.guard';
 
 @Controller('users')
 export class UsersController {
@@ -30,6 +32,7 @@ export class UsersController {
     return this.usersService.create(createUserDto);
   }
 
+  @UseGuards(AuthTokenGard)
   @Patch(':id')
   updateUser(@Param('id', ParseIntPipe) id: number, @Body() updateUserDto) {
     return this.usersService.update(id, updateUserDto);
