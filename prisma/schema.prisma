@@ -33,4 +33,6 @@ model User {
 
   createdAt DateTime @default(now())
   Task      Task[]
+
+  avatar String?
 }

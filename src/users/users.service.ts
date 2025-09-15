@@ -3,6 +3,8 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { HashingServiceProtocol } from 'src/auth/hash/hashing.service';
+import path from 'node:path';
+import fs from 'node:fs';
 
 @Injectable()
 export class UsersService {
@@ -116,6 +118,39 @@ export class UsersService {
       });
       return 'Usuário deletado com sucesso';
     } catch (error) {
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+    }
+  }
+
+  async uploadAvatar(id: number, file: Express.Multer.File) {
+    try {
+      const fileExtension = path
+        .extname(file.originalname)
+        .toLowerCase()
+        .substring(1);
+      const fileName = id + '.' + fileExtension;
+
+      const fileLocale = path.resolve(process.cwd(), 'uploads', fileName);
+
+      await fs.writeFileSync(fileLocale, file.buffer);
+
+      const userExists = await this.prisma.user.findUnique({
+        where: { id },
+      });
+
+      if (!userExists) {
+        throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+      }
+
+      const user = await this.prisma.user.update({
+        where: { id },
+        data: {
+          avatar: fileName,
+        },
+      });
+
+      return user;
+    } catch {
       throw new HttpException('User not found', HttpStatus.NOT_FOUND);
     }
   }

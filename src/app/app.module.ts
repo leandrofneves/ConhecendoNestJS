@@ -12,9 +12,19 @@ import { LoggerMiddleware } from 'src/common/middleware/logger.middleware';
 import { AuthAdminGuard } from 'src/common/guards/admin.guard';
 import { APP_GUARD } from '@nestjs/core';
 import { AuthModule } from 'src/auth/auth.module';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'node:path';
 
 @Module({
-  imports: [TasksModule, UsersModule, AuthModule],
+  imports: [
+    TasksModule,
+    UsersModule,
+    AuthModule,
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', '..', 'uploads'),
+      serveRoot: '/uploads',
+    }),
+  ],
   controllers: [AppController],
   providers: [
     AppService,
