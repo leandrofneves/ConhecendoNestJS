@@ -15,7 +15,7 @@ import {
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
-import { AuthTokenGard } from 'src/auth/guard/auth-token.guard';
+import { AuthTokenGard } from '../auth/guard/auth-token.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('users')
