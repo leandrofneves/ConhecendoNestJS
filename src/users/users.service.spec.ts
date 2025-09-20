@@ -1,6 +1,6 @@
-import { PrismaService } from '../../src/prisma/prisma.service';
+import { PrismaService } from 'src/prisma/prisma.service';
 import { UsersService } from './users.service';
-import { HashingServiceProtocol } from '../../src/auth/hash/hashing.service';
+import { HashingServiceProtocol } from 'src/auth/hash/hashing.service';
 import { Test, TestingModule } from '@nestjs/testing';
 import { CreateUserDto } from './dto/create-user.dto';
 

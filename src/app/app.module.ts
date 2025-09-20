@@ -14,9 +14,15 @@ import { APP_GUARD } from '@nestjs/core';
 import { AuthModule } from 'src/auth/auth.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'node:path';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      envFilePath: process.env.NODE_ENV
+        ? `.env.${process.env.NODE_ENV}`
+        : '.env',
+    }),
     TasksModule,
     UsersModule,
     AuthModule,

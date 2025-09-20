@@ -1,8 +1,8 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { PrismaService } from '../../src/prisma/prisma.service';
+import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { HashingServiceProtocol } from '../../src/auth/hash/hashing.service';
+import { HashingServiceProtocol } from 'src/auth/hash/hashing.service';
 import path from 'node:path';
 import fs from 'node:fs';
 
